@@ -1,6 +1,7 @@
 const Babbage = require('@babbage/sdk')
 const { Authrite } = require('authrite-js')
 const atfinder = require('atfinder')
+const bsv = require('bsv')
 
 /**
  * Send a payment with Paymail
@@ -16,33 +17,33 @@ module.exports = async ({
 }) => {
   const client = new Authrite()
   const { identityKey } = await atfinder.getCertifiedKey(recipient, client)
-  const ourPaymail = await Babbage.ninja.getPaymail()
+  const ourPaymail = await Babbage.getPaymail()
   const derivationPrefix = require('crypto')
     .randomBytes(10)
     .toString('base64')
   const suffix = require('crypto')
     .randomBytes(10)
     .toString('base64')
-  const invoiceNumber = `3241645161d8 ${recipient} ${derivationPrefix} ${suffix}`
   // Derive the public key used for creating the output script
   const derivedPublicKey = await Babbage.getPublicKey({
     protocolID: [2, '3241645161d8'],
     keyID: `${recipient} ${derivationPrefix} ${suffix}`,
-    counterparty: identityKey,
-    invoiceNumber
+    counterparty: identityKey
   })
   // Create an output script that can only be unlocked with the corresponding derived private key
   const script = new bsv.Script(
     bsv.Script.fromAddress(bsv.Address.fromPublicKey(
-      bsv.PublicKey.fromString(derivedAddress)
+      bsv.PublicKey.fromString(derivedPublicKey.result)
     ))
   ).toHex()
-  const tx = await Babbage.createAction({
+  let tx = await Babbage.createAction({
+    description,
     outputs: [{
       script,
       satoshis: parseInt(amount)
     }]
   })
+  tx = tx.result
   tx.outputs = {
     0: {
       suffix
