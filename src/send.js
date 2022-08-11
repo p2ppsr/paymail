@@ -51,7 +51,7 @@ module.exports = async ({
   }
   const request = {
     protocol: '3241645161d8',
-    senderPaymail: ourPaymail,
+    senderPaymail: ourPaymail.result,
     note: description,
     transactions: [tx],
     derivationPrefix
