@@ -33,7 +33,7 @@ module.exports = async ({
   // Create an output script that can only be unlocked with the corresponding derived private key
   const script = new bsv.Script(
     bsv.Script.fromAddress(bsv.Address.fromPublicKey(
-      bsv.PublicKey.fromString(derivedPublicKey.result)
+      bsv.PublicKey.fromString(derivedPublicKey)
     ))
   ).toHex()
   let tx = await Babbage.createAction({
@@ -43,7 +43,6 @@ module.exports = async ({
       satoshis: parseInt(amount)
     }]
   })
-  tx = tx.result
   tx.outputs = {
     0: {
       suffix
@@ -51,12 +50,10 @@ module.exports = async ({
   }
   const request = {
     protocol: '3241645161d8',
-    senderPaymail: ourPaymail.result,
+    senderPaymail: ourPaymail,
     note: description,
     transactions: [tx],
     derivationPrefix
   }
-  const result = await atfinder
-    .submitType42Payment(recipient, request, client)
-  return result
+  return atfinder.submitType42Payment(recipient, request, client)
 }
