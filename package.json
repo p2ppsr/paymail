@@ -33,7 +33,7 @@
   "dependencies": {
     "@babbage/sdk": "^0.3.0",
     "atfinder": "^1.1.1",
-    "authrite-js": "^0.1.11",
+    "authrite-js": "^0.3.2",
     "bsv": "^1.5.6"
   }
 }
